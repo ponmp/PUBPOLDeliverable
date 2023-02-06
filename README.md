@@ -5,6 +5,9 @@ To open the Jupyter notebook deliverable
     git clone https://github.com/ponmp/PUBPOLDeliverableDraft
     cd ./PUBPOLDeliverableDraft
     python -m venv venv
-    pip install -r requirements.txt
+    pip install jupyter
+    pip install pandas
+    pip install htmp5lib
+    pip install rpy2
     ./venv/Scripts/activate
     jupyter notebook ./DeliverableDraft.ipynb
