@@ -1,0 +1,26 @@
+---
+title: "Deliverable Draft 2"
+author: "Matthew Pon"
+date: "2023-02-14"
+output: html_document
+---
+
+```{r setup, echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rigr)
+library(knitr)
+library(epiR)
+```
+
+**Deliverable Draft II**
+
+
+```{r, echo=FALSE, include=TRUE}
+
+```
+
+
+**R code used:**
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+```
