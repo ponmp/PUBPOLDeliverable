@@ -9,5 +9,6 @@ To open the Jupyter notebook deliverable run the following in console
     pip install jupyter
     pip install pandas
     pip install html5lib
+    pip install thefuzz
     pip install rpy2
     jupyter notebook ./DeliverableDraft.ipynb
