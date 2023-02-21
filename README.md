@@ -1,8 +1,8 @@
 # PUBPOLDeliverable
-Project Repo for Deliverables Draft
-To open the Jupyter notebook deliverable run the following in console
+Project Repo for Deliverables
+To open the Jupyter notebook Deliverable 1 run the following in console
 
-    git clone https://github.com/ponmp/PUBPOLDeliverableDraft
+    git clone https://github.com/ponmp/PUBPOLDeliverableMain
     cd ./PUBPOLDeliverableDraft
     python -m venv venv
     ./venv/Scripts/activate
@@ -11,4 +11,4 @@ To open the Jupyter notebook deliverable run the following in console
     pip install html5lib
     pip install thefuzz
     pip install rpy2
-    jupyter notebook ./DeliverableDraft.ipynb
+    jupyter notebook ./Deliverable1.ipynb
