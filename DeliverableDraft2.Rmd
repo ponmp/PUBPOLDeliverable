@@ -1,12 +1,12 @@
 ---
-title: "Deliverable Draft 2"
+title: "Deliverable 2"
 author: "Matthew Pon"
-date: "2023-02-14"
+date: "2023-02-22"
 output: html_document
 ---
 |                        |                  |
 | ---------------------- | ---------------- |
-| Project URL            | https://github.com/ponmp/PUBPOLDeliverableDraft |
+| Project URL            | https://github.com/ponmp/PUBPOLDeliverable2 |
 | Organization URL       | https://github.com/HedgehogsAnonymous           |
 |                        |                  |
 
@@ -17,238 +17,135 @@ library(tidyverse)
 #library(rigr)
 library(knitr)
 #library(epiR)
-library(cluster)
+#library(cluster)
 library(ggplot2)
+#library(FactoMineR)
+#library(dplyr)
+library(corrplot)
 ```
 
 ## Second part of Deliverable Draft
 
 ```{r, echo=FALSE, include=TRUE}
 # Importing the Dataset we prepared in Python from Github
-MasterTableRAW <- readRDS(url("https://github.com/ponmp/PUBPOLDeliverableDraft/raw/main/MasterTable.RDS","rb"))
+MasterTableRAW <- readRDS(url("https://github.com/ponmp/PUBPOLDeliverable2/raw/main/MasterTable.RDS","rb"))
 ```
 
-### Working with the data
+## Working with the data
+Importing the data we prepared in Python, we average (mean) the suicide rates across the years represented by the additional data. We then create three independent variables by combining relevant variables to create "Substance Abuse," "Happiness," and "Progress." Finally, we can then conduct a liner regression against average suicide rates.
 
-We need to average the suicide rates to analyze the data.
-First we create a new column that averages suicide from relevant years. The years should match the range the other data was recorded from.
 ```{r, echo=TRUE, include=FALSE}
+# We need to average the suicide rates to analyze the data.
+# First we create a new column that averages suicide from relevant years. The years should match the range the other data was recorded from.
 # Making an average of the Suicide rates in the years represented by the other data as a new column
 # We pick columns 12 to 22 and take the mean for each country and assign the mean to a new column called SuicideAverage
 MasterTableRAW$SuicideAverage <- rowMeans(MasterTableRAW[ , c(11:21)])
 MasterTableRAW
 ```
-Now we get can drop the individual years from the table and look for trends in the data.
+
 ```{r, echo=TRUE, include=FALSE}
+# Now we get can drop the individual years from the table and look for trends in the data.
 # dropping columns for a better table
 MasterTable <- MasterTableRAW[ -c(2:21) ]
 MasterTable
 ```
-The range
-```{r, echo=FALSE, include=TRUE}
-# show range
-MasterTable %>% pull(SuicideAverage) %>% range
+
+```{r, echo=TRUE, include=FALSE}
+# Taking a non weighted average of all substance abuse.
+# Creating new Column for substance abuse
+# these were given as a rate so we find a mean
+MasterTable$SubstanceAbuse <- rowMeans(MasterTable[ , c(2,3,5)])
 ```
-The IQR
+Here is a correlation matrix of our variables. 
 ```{r, echo=FALSE, include=TRUE}
-# show IQR
-MasterTable %>% pull(SuicideAverage) %>% quantile(probs = c(0.25, 0.75))
+# create a correlation matrix after dropping index and already used variables
+datamatrix <- cor(MasterTable[ , -c(1,2,3,5,23)])
+corrplot(datamatrix, method="number")
 ```
-Standard Deviation
-```{r, echo=FALSE, include=TRUE}
-# show sd
-MasterTable %>% pull(SuicideAverage) %>% sd 
-```
-Variance
-```{r, echo=FALSE, include=TRUE}
-# show variance
-MasterTable %>% pull(SuicideAverage) %>% var
+```{r, echo=TRUE, include=FALSE}
+# Taking relevant values and creating a formula to calculate depression.
+# Create new Column for depression.
+# These are given as percentages so we divide by 100
+# Satisfaction / 100
+Satisfaction <- MasterTable %>% pull(Satisfaction)/100
+# Personal Rights / 100
+Rights <- MasterTable %>% pull(`Personal Rights`)/100
+# personal freedom /100
+Freedom <- MasterTable %>% pull(`Personal Freedom and Choice`)/100
+# foundations of wellbeing /100
+Wellbeing <- MasterTable %>% pull(`Foundations of Wellbeing`)/100
+# foundations of opportunity /100
+Opportunity <- MasterTable %>% pull(Opportunity)/100
+# adding up all the factors that contribute to depression
+MasterTable$Happiness <- (Satisfaction + Rights + Freedom + Wellbeing + Opportunity)
 ```
 
-This is a histogram of the average suicide rates. Notice it's right skewed.
-```{r, echo=FALSE, include=TRUE}
-# Make a histogram
-MasterTable %>% pull(SuicideAverage) %>% hist(xlab = "Suicide Rate", main = "Distribution of Suicide Rates")
+```{r, echo=TRUE, include=FALSE}
+# Taking relevant values for Progress
+# Create a new column for Progress
+# percentages
+Progress <- MasterTable %>% pull(`Social Progress Score`)/100
+Needs <- MasterTable %>% pull(`Basic Human Needs`)/100
+Medical <- MasterTable %>% pull(`Nutrition and Basic Medical Care`)/100
+Sanitation <- MasterTable %>% pull(`Water and Sanitation`)/100
+Shelter <- MasterTable %>% pull(Shelter)/100
+Safety <- MasterTable %>% pull(`Personal Safety`)/100
+MasterTable$Progress <- (Progress + Needs + Medical + Sanitation + Shelter + Safety)
 ```
 
-Selecting another variable
+### Linear Regression
+
+We can use a histogram to check the independent and dependent variables for normality.
 
 ```{r, echo=FALSE, include=TRUE}
-# looking at Alcohol as second variable
-MasterTable %>% pull(Alcohol) %>% hist(xlab = "Alcohol consumption", main = "Dist of Alcohol use")
-```
-```{r, echo=FALSE, include=TRUE}
-lmSRaA <- lm(SuicideAverage~Alcohol, data =  MasterTable)
-summary(lmSRaA)
-```
-
-
-```{r, echo=FALSE, include=TRUE}
-# looking at tobacco use
-MasterTable %>% pull(Tobacco) %>% hist(xlab = "Tobacco use", main = "Dist of Tobacco use")
-```
-```{r, echo=FALSE, include=TRUE}
-lmSRaT <- lm(SuicideAverage~Tobacco, data =  MasterTable)
-summary(lmSRaT)
-```
-
-```{r, echo=FALSE, include=TRUE}
-# looking at cocaine use
-#MasterTable %>% pull(Cocaine) %>% hist(xlab = "Cocaine use", main = "Dist of Cocaine use")
-# not normal distribution
-```
-```{r, echo=FALSE, include=TRUE}
-# Satisfaction
-MasterTable %>% pull(Satisfaction) %>% hist(xlab = "Life Satisfaction Index", main = "Dist of LSI")
-```
-```{r, echo=FALSE, include=TRUE}
-lmSRaS <- lm(SuicideAverage~Satisfaction, data =  MasterTable)
-summary(lmSRaS)
+# Create a histogram for Suicide
+MasterTable %>% pull(SuicideAverage) %>% hist(xlab = "Suicides per 100,000 people", main = "Histogram of Suicide Rates")
 ```
 
 ```{r, echo=FALSE, include=TRUE}
-# Social Progress
-MasterTable %>% pull(`Social Progress Score`) %>% hist(xlab = "Social Progress Score", main = "Dist of Social Progress Score")
-```
-```{r, echo=FALSE, include=TRUE}
-SPS <- MasterTable$`Social Progress Score`
-lmSRaSP <- lm(SuicideAverage~SPS, data =  MasterTable)
-summary(lmSRaSP)
+# Create a histogram for Substance Abuse
+MasterTable %>% pull(SubstanceAbuse) %>% hist(xlab = "Substance Abuse Score", main = "Histogram of Substance Abuse")
 ```
 
 ```{r, echo=FALSE, include=TRUE}
-#MasterTable %>% pull(`Basic Human Needs`) %>% hist(xlab = "Basic Human Needs", main = "Dist of BHN")
-# Not Normally Distributed
+# histogram for happiness
+MasterTable %>% pull(Happiness) %>% hist(xlab = "Happiness Score", main = "Histogram of Happiness Scores")
 ```
 
 ```{r, echo=FALSE, include=TRUE}
-# Wellbeing
-MasterTable %>% pull(`Foundations of Wellbeing`) %>% hist(xlab = "Foundations of Wellbeing", main = "Dist of FWB")
-```
-```{r, echo=FALSE, include=TRUE}
-FWB <- MasterTable$`Foundations of Wellbeing`
-lmSRaWB <- lm(SuicideAverage~FWB, data =  MasterTable)
-summary(lmSRaWB)
+# histogram for social progress
+MasterTable %>% pull(Progress) %>% hist(xlab = "Social Progress Score", main = "Histogram of Social Progress Scores")
 ```
 
+Normality is "good enough." Suicide rates and social progress show right and left skews.
+We can now conduct regression
+
+Scatterplot of Suicide and Substance Abuse
 ```{r, echo=FALSE, include=TRUE}
-#MasterTable %>% pull(Opportunity) %>% hist(xlab = "Opportunity", main = "Dist of Opportunity")
-# not normally distributed
+# creating a scatterplot for suicide vs substance abuse
+ggplot(MasterTable, aes(x=SuicideAverage, y=SubstanceAbuse)) + geom_point() + geom_smooth(method=lm, se=FALSE)
 ```
 
+Scatterplot of Suicide and Happiness
 ```{r, echo=FALSE, include=TRUE}
-#MasterTable %>% pull(`Nutrition and Basic Medical Care`) %>% hist(xlab = "Nutrition and Medical", main = "Dist of Nutrition and Medical Care")
-# not normally distributed
+# creating a scatterplot for suicide vs happiness
+ggplot(MasterTable, aes(x=SuicideAverage, y=Happiness)) + geom_point() + geom_smooth(method=lm, se=FALSE)
 ```
 
+Scatterplot of Suicide and Progress
 ```{r, echo=FALSE, include=TRUE}
-#MasterTable %>% pull(`Water and Sanitation`) %>% hist(xlab = "Cocaine use", main = "Dist Water and Sanitation")
-# not normally distributed
+# creating a scatterplot for suicide vs happiness
+ggplot(MasterTable, aes(x=SuicideAverage, y=Progress)) + geom_point() + geom_smooth(method=lm, se=FALSE)
 ```
 
+Multiple regression of Average Suicide Rate against Substance Abuse, Happiness, and Progress.
 ```{r, echo=FALSE, include=TRUE}
-#MasterTable %>% pull(Shelter) %>% hist(xlab = "Cocaine use", main = "Dist of Shelter")
-# not normally distributed
+# create multiple regression and output summary
+MRegress <- lm(SuicideAverage ~ SubstanceAbuse + Happiness + Progress, data = MasterTable)
+summary(MRegress)
 ```
 
-```{r, echo=FALSE, include=TRUE}
-# personal safety
-MasterTable %>% pull(`Personal Safety`) %>% hist(xlab = "Degree of Personal Safety", main = "Distribution of Personal Safety")
-```
-```{r, echo=FALSE, include=TRUE}
-PS <- MasterTable$`Personal Safety`
-lmSRaPS <- lm(SuicideAverage~PS, data =  MasterTable)
-summary(lmSRaPS)
-```
-
-```{r, echo=FALSE, include=TRUE}
-#MasterTable %>% pull(`Personal Rights`) %>% hist(xlab = "Cocaine use", main = "Dist of Per Rights")
-# not normally distributed
-```
-
-```{r, echo=FALSE, include=TRUE}
-# personal freedom
-MasterTable %>% pull(`Personal Freedom and Choice`) %>% hist(xlab = "Personal Freedom", main = "Dist of Personal Freedom")
-```
-```{r, echo=FALSE, include=TRUE}
-PF <- MasterTable$`Personal Freedom and Choice`
-lmSRaPF <- lm(SuicideAverage~PF, data =  MasterTable)
-summary(lmSRaPF)
-```
-
-```{r, echo=FALSE, include=TRUE}
-# inclusiveness
-MasterTable %>% pull(Inclusiveness) %>% hist(xlab = "Cocaine use", main = "Dist of Inclusiveness")
-```
-```{r, echo=FALSE, include=TRUE}
-lmSRaI <- lm(SuicideAverage~Inclusiveness, data =  MasterTable)
-summary(lmSRaI)
-```
-
-```{r, echo=FALSE, include=TRUE}
-# looking at adv edu
-MasterTable %>% pull(`Access to Advanced Education`) %>% hist(xlab = "Access to Advanced Education", main = "Dist of Adv. Edu.")
-```
-```{r, echo=FALSE, include=TRUE}
-AE <- MasterTable$`Access to Advanced Education`
-lmSRaAE <- lm(SuicideAverage~AE, data =  MasterTable)
-summary(lmSRaAE)
-```
-```{r, echo=FALSE, include=TRUE}
-plot(lmSRaA)
-```
-
-
-## Clustering the data
-
-```{r, echo=FALSE, include=TRUE}
-# remove country names from master table and add them as the index
-WorkingTable <- MasterTable[, -c(1)]
-row.names(WorkingTable) <- MasterTable$Country
-set.seed(882) # set the noise
-DistanceMatrix=daisy(x=WorkingTable) # set matrix to euclidean since everything is numeric
-ProjectedData = cmdscale(DistanceMatrix, k=21)
-# check 
-MasterTable$dim1 = ProjectedData[,1]
-MasterTable$dim2 = ProjectedData[,2]
-MasterTable$dim3 = ProjectedData[,3]
-MasterTable$dim4 = ProjectedData[,4]
-MasterTable$dim5 = ProjectedData[,5]
-MasterTable$dim6 = ProjectedData[,6]
-MasterTable$dim7 = ProjectedData[,7]
-MasterTable$dim8 = ProjectedData[,8]
-MasterTable$dim9 = ProjectedData[,9]
-MasterTable$dim10 = ProjectedData[,10]
-MasterTable$dim11 = ProjectedData[,11]
-MasterTable$dim12 = ProjectedData[,12]
-MasterTable$dim13 = ProjectedData[,13]
-MasterTable$dim14 = ProjectedData[,14]
-MasterTable$dim15 = ProjectedData[,15]
-MasterTable$dim16 = ProjectedData[,16]
-MasterTable$dim17 = ProjectedData[,17]
-MasterTable$dim18 = ProjectedData[,18]
-MasterTable$dim19 = ProjectedData[,19]
-MasterTable$dim20 = ProjectedData[,20]
-MasterTable$dim21 = ProjectedData[,21]
-MasterTable[,c('dim1','dim2')][1:60,]
-```
-```{r, echo=FALSE, include=TRUE}
-base <- ggplot(data=MasterTable, aes(x=dim1, y=dim9, label=Country)) 
-base + geom_text(size=2)
-```
-
-```{r, echo=FALSE, include=TRUE}
-hc = hclust(DistanceMatrix)
-# very simple dendrogram
-plot(hc,hang = -1,cex=0.5)
-```
- 
- 
- 
-## Linear Regression
- 
-Checking for variables with normality
-
+While we conducted regression analysis on three independent variables, the only one that showed significance with a P-value of 0.006 was Substance Abuse. The other independent variables, happiness and progress, were not statistically significant enough at P>0.1. Substance abuse showed a positive relationship where the average suicide rate would increase by 0.6076 incidents per 100,000 people per 1 average unit of increase in substance abuse. Happiness showed a positive 0.1096 incidents per 100,000 people per 1 score of happiness. Progress showed a negative 2.3763 incidents per 100,000 people per 1 score of progress. Again neither happiness nor progress were statistically significant. This suggests that, from the data collected off Wikipedia of alcohol, tobacco, and cocaine use, mean substance abuse and average suicide rate are related while happiness and social progress, as I calculated, are not.
 
 # Appendix
 
