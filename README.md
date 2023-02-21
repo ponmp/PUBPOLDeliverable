@@ -1,6 +1,6 @@
 # PUBPOLDeliverable
-Project Repo for Deliverables
-To open the Jupyter notebook Deliverable 1 run the following in console
+Project Repo for Deliverables Draft
+To open the Jupyter notebook deliverable run the following in console
 
     git clone https://github.com/ponmp/PUBPOLDeliverableMain
     cd ./PUBPOLDeliverableMain

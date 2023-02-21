@@ -4,9 +4,15 @@ author: "Matthew Pon"
 date: "2023-02-22"
 output: html_document
 ---
+<br> 
+<center><img src="https://hengeofthehedge.ddns.net/index.php/apps/theming/icon?v=98fbc42f" width="500"></center>
+
 |                        |                  |
 | ---------------------- | ---------------- |
-| Project URL            | https://github.com/ponmp/PUBPOLDeliverable2 |
+| Project URL            | https://github.com/ponmp/PUBPOLDeliverableMain |
+| Deliverable 1          | https://ponmp.github.io/deliverableone/ |
+| Deliverable 2          | https://ponmp.github.io/deliverabletwo/ |
+| Deliverable 3          | https://ponmp.github.io/deliverablethree/ |
 | Organization URL       | https://github.com/HedgehogsAnonymous           |
 |                        |                  |
 
@@ -19,16 +25,15 @@ library(knitr)
 #library(epiR)
 #library(cluster)
 library(ggplot2)
-#library(FactoMineR)
 #library(dplyr)
 library(corrplot)
 ```
 
-## Second part of Deliverable Draft
+## Second part of Deliverable
 
 ```{r, echo=FALSE, include=TRUE}
 # Importing the Dataset we prepared in Python from Github
-MasterTableRAW <- readRDS(url("https://github.com/ponmp/PUBPOLDeliverable2/raw/main/MasterTable.RDS","rb"))
+MasterTableRAW <- readRDS(url("https://github.com/ponmp/PUBPOLDeliverableMain/raw/main/MasterTable.RDS","rb"))
 ```
 
 ## Working with the data
