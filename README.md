@@ -11,4 +11,4 @@ To open the Jupyter notebook deliverable run the following in console
     pip install html5lib
     pip install thefuzz
     pip install rpy2
-    jupyter notebook ./Deliverable1.ipynb
+    jupyter notebook ./Deliverable1Final.ipynb
