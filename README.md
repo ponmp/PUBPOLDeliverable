@@ -1,8 +1,8 @@
 # PUBPOLDeliverable
 ## Project Repo for Deliverables Draft
 ### Dependencies:
-- Python = 3.10.6
-- Git
+- Python = [3.10.6](https://www.python.org/downloads/windows/), with PATH access
+- [Git](https://git-scm.com/download/win)
 
 To open the Jupyter notebook for Deliverable 1 run the following in console
 
