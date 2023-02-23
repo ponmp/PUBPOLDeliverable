@@ -1,5 +1,5 @@
 # PUBPOLDeliverable
-## Project Repo for Deliverables Draft
+## Project Repo for Deliverables
 ### Dependencies:
 - Python = [3.10.6](https://www.python.org/downloads/windows/), with PATH access
 - [Git](https://git-scm.com/download/win)
